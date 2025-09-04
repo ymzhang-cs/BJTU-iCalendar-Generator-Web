@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北京交通大学课表日历生成器</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+
+        .upload-area.dragover {
+            border-color: #0d6efd;
+            background-color: #e7f3ff;
+        }
+
+        .feature-card {
+            transition: transform 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <!-- 导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="bi bi-calendar3"></i>
+                    北京交通大学课表日历生成器
+                </a>
+            </div>
+        </nav>
+
+        <!-- 主要内容 -->
+        <div class="container my-5">
+            <!-- 标题区域 -->
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h1 class="display-4 mb-3">课表日历生成器</h1>
+                    <p class="lead text-muted">将教务系统课表转换为日历文件，支持导入到各种日历应用</p>
+                </div>
+            </div>
+
+            <!-- 上传区域 -->
+            <div class="row mb-5">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card shadow">
+                        <div class="card-body p-4">
+                            <h3 class="card-title text-center mb-4">
+                                <i class="bi bi-cloud-upload text-primary"></i>
+                                上传课表文件
+                            </h3>
+
+                            <div class="upload-area" id="uploadArea">
+                                <i class="bi bi-file-earmark-text display-1 text-muted mb-3"></i>
+                                <h5>拖拽HTML文件到此处或点击选择文件</h5>
+                                <p class="text-muted">支持 .html 和 .htm 格式的课表文件</p>
+                                <input type="file" id="fileInput" class="d-none" accept=".html,.htm">
+                                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                                    <i class="bi bi-folder2-open"></i> 选择文件
+                                </button>
+                            </div>
+
+                            <div id="uploadProgress" class="mt-3" style="display: none;">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                        role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <p class="text-center mt-2">正在处理文件...</p>
+                            </div>
+
+                            <div id="resultArea" class="mt-4" style="display: none;">
+                                <div class="alert alert-success">
+                                    <h5><i class="bi bi-check-circle"></i> 处理成功！</h5>
+                                    <p id="resultMessage"></p>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                    <button class="btn btn-success" id="downloadBtn">
+                                        <i class="bi bi-download"></i> 下载ICS文件
+                                    </button>
+                                    <button class="btn btn-info" id="caldavBtn">
+                                        <i class="bi bi-calendar-plus"></i> 创建CalDAV账户
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 功能特性 -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="text-center mb-4">功能特性</h2>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-file-earmark-code display-4 text-primary mb-3"></i>
+                            <h5>智能解析</h5>
+                            <p class="text-muted">自动识别课表HTML文件中的课程信息，包括时间、地点、教师等</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-calendar-check display-4 text-success mb-3"></i>
+                            <h5>标准格式</h5>
+                            <p class="text-muted">生成标准iCalendar格式文件，兼容所有主流日历应用</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-cloud display-4 text-info mb-3"></i>
+                            <h5>CalDAV支持</h5>
+                            <p class="text-muted">支持创建CalDAV账户，实现日历同步和共享</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 使用步骤 -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="text-center mb-4">使用步骤</h2>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="text-center">
+                        <div class="step-number">1</div>
+                        <h5>登录教务系统</h5>
+                        <p class="text-muted">登录北京交通大学教务系统，进入课表页面</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="text-center">
+                        <div class="step-number">2</div>
+                        <h5>保存HTML文件</h5>
+                        <p class="text-muted">使用Ctrl+S保存页面，选择"网页，仅HTML"格式</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="text-center">
+                        <div class="step-number">3</div>
+                        <h5>上传文件</h5>
+                        <p class="text-muted">将保存的HTML文件上传到本系统</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="text-center">
+                        <div class="step-number">4</div>
+                        <h5>下载日历</h5>
+                        <p class="text-muted">下载生成的ICS文件或创建CalDAV账户</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="bg-light py-4 mt-5">
+            <div class="container text-center">
+                <p class="text-muted mb-0">
+                    © 2024 北京交通大学课表日历生成器 |
+                    <a href="https://github.com/ymzhang-cs/BJTU-iCalendar-Generator" target="_blank">
+                        <i class="bi bi-github"></i> GitHub
+                    </a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- CalDAV设置模态框 -->
+    <div class="modal fade" id="caldavModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar-plus"></i> CalDAV账户设置
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle"></i> 账户信息</h6>
+                        <p class="mb-0">请保存以下账户信息，用于在日历应用中添加CalDAV账户</p>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">服务器地址</label>
+                            <input type="text" class="form-control" id="serverUrl" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">用户名</label>
+                            <input type="text" class="form-control" id="username" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">密码</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                                    <i class="bi bi-eye" id="passwordToggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">日历URL</label>
+                            <input type="text" class="form-control" id="calendarUrl" readonly>
+                        </div>
+                    </div>
+
+                    <div class="accordion" id="setupAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#iosSetup">
+                                    <i class="bi bi-phone"></i> iOS设置步骤
+                                </button>
+                            </h2>
+                            <div id="iosSetup" class="accordion-collapse collapse show"
+                                data-bs-parent="#setupAccordion">
+                                <div class="accordion-body">
+                                    <ol id="iosSteps">
+                                        <!-- iOS设置步骤将在这里动态填充 -->
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#androidSetup">
+                                    <i class="bi bi-android2"></i> Android设置步骤
+                                </button>
+                            </h2>
+                            <div id="androidSetup" class="accordion-collapse collapse" data-bs-parent="#setupAccordion">
+                                <div class="accordion-body">
+                                    <ol id="androidSteps">
+                                        <!-- Android设置步骤将在这里动态填充 -->
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="copyAccountInfo()">
+                        <i class="bi bi-clipboard"></i> 复制账户信息
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>

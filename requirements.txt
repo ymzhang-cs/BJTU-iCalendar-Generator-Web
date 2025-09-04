@@ -1,0 +1,11 @@
+Flask
+Flask-CORS
+Werkzeug
+requests
+beautifulsoup4
+lxml
+python-dateutil
+pytz
+gunicorn
+bcrypt
+ics

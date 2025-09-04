@@ -205,3 +205,20 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# 项目特定文件
+uploads/
+outputs/
+radicale_data/
+*.ics
+.env
+ssl/
+test_output.ics
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp

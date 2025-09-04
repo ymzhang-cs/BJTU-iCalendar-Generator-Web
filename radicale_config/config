@@ -1,0 +1,19 @@
+[server]
+hosts = 0.0.0.0:5232
+daemon = False
+pid = /tmp/radicale.pid
+
+[auth]
+type = htpasswd
+htpasswd_filename = /config/users
+htpasswd_encryption = bcrypt
+
+[rights]
+type = owner_only
+
+[storage]
+type = filesystem
+folder = /data
+
+[logging]
+level = INFO
